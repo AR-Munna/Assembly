@@ -1,0 +1,105 @@
+segment .data
+	scfmt : dq "%lld" ,0
+	stringfmt: dq "%s" ,0
+	newline : dq "" ,10, 0
+	prfmt: dq "%lld" ,10, 0
+    fmt2: db "Vowel: %lld",10,0
+    printnotpal: dq "%s is not pallindrome" ,10 ,0
+	test: dq "*", 10, 0
+	v dq 0
+	c dq 0
+
+segment .bss
+	s: resq 100
+	l: resq 1
+segment .text
+	global main
+	extern scanf
+	extern printf,gets
+
+main:
+	push rbp
+	mov rbp ,rsp
+	mov rax ,0
+	;mov rdi , stringfmt
+	mov rdi ,s
+	call gets
+	mov rbx ,0
+	mov rcx ,0
+
+loop:
+	mov rax ,[s+rcx]
+	cmp rax , 0
+	je length
+	inc rcx
+	jmp loop
+
+length:
+	dec rcx
+	mov [l] ,rcx
+	mov rax , [l]
+	push rax
+	xor rcx, rcx
+	call vowel_count
+	leave
+	ret
+
+vowel_count:
+	push rbp
+	mov rbp ,rsp
+
+	mov rbx ,[rbp+16]
+	mov dl ,[s+rbx]
+
+	;cmp dl, 0
+	;je print
+
+	cmp dl, 97
+    je vowel_increase
+
+    cmp dl, 101
+    je vowel_increase
+
+    cmp dl, 105
+    je vowel_increase
+
+    cmp dl, 111
+    je vowel_increase
+
+    cmp dl, 117
+    je vowel_increase
+
+	dec rbx
+	push rbx
+
+	cmp rbx, 0
+	jne callfunc
+	je print
+
+callfunc:
+    add qword[c],1
+	call vowel_count
+	leave
+	ret
+
+vowel_increase:
+    add qword[v],1
+    ;mov rax , 0
+	;mov rdi ,test
+	;call printf
+	;call vowel_count
+	;jmp callfunc
+	;leave
+	;ret
+
+print:
+	mov rax , 0
+	mov rdi ,fmt2
+	;mov rsi ,[v]
+	mov rsi, [v]
+	call printf
+	mov rax ,0
+	mov rdi ,newline
+	call printf
+	leave
+	ret
